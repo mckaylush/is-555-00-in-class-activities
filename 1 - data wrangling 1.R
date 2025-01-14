@@ -3,7 +3,7 @@ library(tidyverse)
 # Because `starwars` is a "hidden" dataset in memory for demonstration, it won't 
 # show up in our environment at first, and it'll also be hard to reset it if we 
 # make a mistake. So assign it to `df` to make sure you can work with it.
-df <- starwars
+df <- starwars 
 
 # glimpse turns a data frame on its side for viewing. Super useful.
 
@@ -17,11 +17,18 @@ df <- starwars
 # note: columns can contain lists; more on that later
 # note: filtering on some logical excludes NAs
 
+create_answer <- df %>% 
+  filter(height > 100,
+         sex == 'female') %>% 
+  select(name, height,mass,species,films) %>% 
+  filter(mass > 50) %>% 
+  arrange(desc(mass)) 
 
 # calculate a new column,weight_lbs = mass * 2.204623
 # Make sure it gets saved to the tibble...
 
-
+df %>% 
+  mutate(weight_lbs = mass * 2.204623)
 
 # group and summarize. Pay attention to NAs
 # get a count and mean mass by species
