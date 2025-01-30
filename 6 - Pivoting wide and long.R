@@ -149,6 +149,36 @@ bob <- read_csv('https://www.dropbox.com/s/mozqpceit51hia7/bob_ross.csv?dl=1')
 bob %>% 
   glimpse
 
+bob %>% 
+  pivot_longer(apple_frame:wood_framed,
+               names_to = 'object',
+               values_to = 'is_included') %>% 
+  group_by(object) %>% 
+  summarize(count_appearance = sum(is_included)) %>% 
+  arrange(desc(count_appearance))
+
+# This shows which seasons had mountains drawn and it shows how many are in each season
+bob %>% 
+  pivot_longer(apple_frame:wood_framed,
+               names_to = 'object',
+               values_to = 'is_included') %>% 
+  filter(str_detect(object, 'mountain')) %>% 
+  filter(is_included == 1) %>% 
+  # is_included only grabs mountains that have 1 and ignores all the 0s
+  group_by(season) %>% 
+  summarize(count = n())
+
+# Double pivot
+bob %>% 
+  pivot_longer(apple_frame:wood_framed,
+               names_to = 'object',
+               values_to = 'is_included') %>% 
+  filter(is_included == 1) %>% 
+  group_by(season, object) %>% 
+  summarize(count=n()) %>% 
+  pivot_wider(names_from = season,
+              values_from = count,
+              values_fill = 0)
 
 # IMPORTANT: Notice how EASY it is to find the top income for each religion because
 # of the tidying of the data we've done. It's a simple filter, rather than a 
@@ -193,10 +223,6 @@ ri %>%
 
 
 
-a
-
-
-
 
 
 
@@ -209,8 +235,7 @@ songs %>%
     names_to = 'week',
     values_to = 'rank'
   ) %>% 
-  filter(!is.na(rank)) %>% 
-  filter(week == 'wk1')
+  filter(!is.na(rank))
 
 
 
