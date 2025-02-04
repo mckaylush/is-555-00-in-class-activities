@@ -14,18 +14,19 @@ movies <- read_csv('https://www.dropbox.com/scl/fi/pi7nexxuoqnvviwfzwun9/movie_r
 
 
 
-steak <- read_csv('https://www.dropbox.com/scl/fi/mzg5oxenh9oonbwpwgxzm/steak_data.csv?rlkey=2gbf1kfqfkln0zf2alwo32nza&dl=1')
+steak <- read_csv('https://www.dropbox.com/scl/fi/mzg5oxenh9oonbwpwgxzm/steak_data.csv?rlkey=2gbf1kfqfkln0zf2alwo32nza&dl=1') %>% 
+  mutate(steak_prep = factor(steak_prep, levels = c('Rare','Medium rare','Medium','Medium Well','Well')))
 
 
 # Here's a dumb chart:
 steak %>% 
+  filter(!is.na(steak_prep)) %>% 
   ggplot(aes(x = steak_prep, fill = educ)) +
-    geom_bar() +
-    # facet_grid(educ ~ hhold_income) +
-    labs(title = "Steak Preparation Preference by Education Level",
-         x = "Steak Preparation",
-         y = "Count") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  geom_bar() +
+  labs(title = "Steak Preparation Preference by Education Level",
+       x = "Steak Preparation",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 # What else can you find? What other variables are in the dataset that might 
