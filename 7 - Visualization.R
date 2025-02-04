@@ -70,11 +70,10 @@ penguins %>%
 penguins %>% 
   ggplot(aes(x = body_mass_g, color = species, fill = species)) +
   geom_histogram(alpha = .5, position = 'identity',bins = 15) +
-  ggthemes::theme_clean() +
+  ggthemes::theme_stata() +
   labs(title = 'This is the title',
        x = "Penguin Weight",
        y = 'Count')
-
 
 # density curves are sometimes nicer. Let's do the above but with 
 # a density curve. Alpha is nice here.
@@ -83,7 +82,10 @@ penguins %>%
 
 # bar charts with categoricals: quick, easy counts summary
 # stacked vs. side-by-side
-
+penguins %>% 
+  ggplot(
+    mapping = aes(x = species,fill=species))+
+  geom_bar()
 
 
 
