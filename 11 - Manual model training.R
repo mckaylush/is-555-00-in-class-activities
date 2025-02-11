@@ -48,5 +48,23 @@ loan_predictions <- apply_rules(loan_data)
 calculate_loss(loan_predictions)
 
 
+loan_predictions
 
 
+
+
+
+
+
+# What about next week's loans, though?
+
+new_applications <- tribble(
+  ~applicant_id,  ~stable_job,  ~outstanding_debt, ~loan_approved,
+  101,             1,            0,                 'approve',
+  102,             0,            0,                 'deny',
+  103,             0,            1,                 'approve',
+  104,             0,            0,                 'deny',
+  105,             1,            1,                 'deny'
+)
+new_predictions <- apply_rules(new_applications)
+calculate_loss(new_predictions)
