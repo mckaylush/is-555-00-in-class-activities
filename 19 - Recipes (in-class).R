@@ -40,7 +40,12 @@ cr_testing <- cr_split %>% testing()
 #    - normalizes all numeric predictors
 #    - dummy codes all categories
 
-
+cr_rec <- recipe(status ~ ., 
+                 data = cr_training) %>% 
+  step_impute_median(all_numeric_predictors()) %>% 
+  step_log(assets, debt, income, price, expenses, offset = 1) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_dummy(all_nominal_predictors()) 
 
 
 
@@ -107,9 +112,18 @@ flights_testing <- flights_split %>% testing()
 # Let's create a recipe to handle everything we did for `flights_fe` above:
 #   Some new steps to try: step_date(), step_range()
 
+flights_rec <- recipe(arr_delay ~ .,
+                      data = flights_training) %>% 
+  step_date(date, features = c('dow','month')) %>% 
+  step_impute_median(distance) %>% 
+  # step_range(dep_delay, min = 1, max = 2000) %>% 
+  step_log(air_time, distance, dep_delay) %>% 
+  step_normalize(dep_time,air_time,distance,dep_delay) %>% 
+  step_dummy(origin, carrier) 
 
-
-
+# Look at departure delay with and without step_range()
+flights_training %>% select(dep_delay) %>% summary()
+flights_rec %>% prep() %>% bake(new_data = flights_training) %>% select(dep_delay) %>% summary()
 
 # If you want to check your work as you go:
 flights_rec %>% prep() %>% bake(new_data = flights_training)
@@ -143,6 +157,10 @@ cars %>% glimpse
 # missingness counts:
 cars %>% summarize(across(everything(), ~sum(is.na(.)))) %>% glimpse
 
+# There are lots of makes and even more models
+cars %>% count(make)
+cars %>% count(model)
+
 # Quick look at the distributions of numerics:
 cars %>% 
   select(where(is.numeric)) %>% 
@@ -167,10 +185,25 @@ cars_testing <- cars_split %>% testing()
 #     - dummy coding for all categories
 #
 # New steps to try: step_YeoJohnson(), step_unknown(), step_other()
+cars_rec <- recipe(sellingprice_log ~ .,
+       data = cars_training) %>% 
+  step_impute_median(all_numeric_predictors()) %>% 
+  step_YeoJohnson(all_numeric_predictors()) %>% 
+  step_unknown(c(make, model), new_level = 'this_was_missing') %>% 
+  # step_other(c(make, model), threshold = .05) %>% 
+  step_normalize(all_numeric_predictors()) 
+  # %>% step_dummy(all_nominal_predictors())
 
 
 
+# Look at the effect of step_unknown() and step_other()
+cars_rec %>% prep() %>% bake(new_data = cars_training) %>% 
+  count(make, sort = T) %>% 
+  print(n=20)
 
+
+cars_rec %>% prep() %>% bake(new_data = cars_training) %>% 
+  count(model)
 
 
 
@@ -220,7 +253,8 @@ claims_training <- claims_split %>% training()
 claims_testing <- claims_split %>% testing()
 
 # Create a recipe that applies best-practice pre-processing operations:
-
+claims_rec <- recipe(log_loss ~ .,
+                     data = claims_training)
 
 
 # And then setup and train a model:
