@@ -226,21 +226,30 @@ cars_testing_small %>% count(make) %>%
 
 cars_rec_small <- recipe(sellingprice_log ~ .,
                    data = cars_training_small) %>% 
-  step_novel(c(make, model)) %>% 
-  step_unknown(c(make, model), new_level = 'missing') #%>% 
-  # step_other(c(make), threshold = .05) %>%
-  # step_other(c(model), threshold = .015) # %>%
+  step_unknown(c(make), new_level = 'missing') %>%
+  step_novel(c(make)) %>%
+  step_other(c(make), threshold = .05) %>%
+  step_other(c(model), threshold = .015) #%>%
   # step_dummy(all_nominal_predictors())
 
 # First, the effect of step_unknown() and step_novel():
 # no more missing:
 cars_rec_small %>% prep() %>% bake(new_data = cars_training_small) %>% 
-  count(is.na(model))
+  count(is.na(make)) 
+cars_rec_small %>% prep() %>% bake(new_data = cars_training_small) %>% 
+  count(make)
+cars_rec_small %>% prep() %>% bake(new_data = cars_training_small) %>% 
+  count(model)
+
+cars_training_small %>% count(is.na(model))
 
 # And in the test data, no more 'Lotus', for example:
 cars_rec_small %>% prep() %>% bake(new_data = cars_testing_small) %>% 
-  count(model) %>% 
-  filter(model %in% c('Lotus','new'))
+  count(make) %>% 
+  filter(make %in% c('Lotus','new'))
+
+cars_testing_small %>% 
+  count(make)
 
 
 
