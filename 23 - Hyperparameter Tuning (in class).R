@@ -33,20 +33,49 @@ cr_training %>% count(status)
 cr_rec %>% prep() %>% juice() %>% count(status)
 
 # Now let's setup a model spec (rpart decision tree), workflow, and do a cross validation.
+model_spec <- decision_tree() %>% 
+  set_engine('rpart') %>% 
+  set_mode('classification')
+
+cr_wkfl <- workflow() %>% 
+  add_model(model_spec) %>% 
+  add_recipe(cr_rec)
+
+cr_folds <- vfold_cv(data = cr_training, strata = status)
 
 
 
 
 # Next, a tunable model specification, recipe, and workflow:
 
+model_spec_tunable <- decision_tree(
+  tree_depth = tune(),
+  min_n = tune()
+) %>% 
+  set_engine('rpart') %>% 
+  set_mode('classification')
 
+cr_rec_tunable <- recipe(status ~ ., 
+                 data = cr_training) %>% 
+  step_impute_median(all_numeric_predictors()) %>% 
+  step_log(assets, debt, income, price, expenses, offset = 1) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  themis::step_downsample(status, under_ratio = tune())
 
+cr_wkfl_tunable <- workflow() %>% 
+  add_model(model_spec_tunable) %>% 
+  add_recipe(cr_rec_tunable)
 
 # Extract parameters, create a grid to search, then search:
 
+params <- extract_parameter_set_dials(cr_wkfl_tunable)
 
+tuning_grid <- grid_random(params,n=5)
 
-
+tuning_results <- cr_wkfl_tunable %>% 
+  tune_grid(grid = tuning_grid,
+            resamples = cr_folds)
 
 # Look at the results, selecting the best one and using those to finalize.
 

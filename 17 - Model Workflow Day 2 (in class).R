@@ -9,7 +9,17 @@ laptops <- read_csv('https://www.dropbox.com/scl/fi/rsetl7vzy4nfd10ihmr96/laptop
 # Before we jump into train/test split, let's look at the data and
 # see if we can come up with any new features.
 
+lap_split <- initial_split(laptops, strata = price)
 
+lap_training <- lap_split %>% training()
+lap_testing <-  lap_split %>%  testing()
 
+lap_lr <- linear_reg() %>% 
+  set_engine("brulee") %>% 
+  set_mode('regression')
+
+lap_lr %>% 
+fit(price~ .,
+    data = lap_training)
 
 # Okay now take the modified dataset into the initial_split() function (and beyond).

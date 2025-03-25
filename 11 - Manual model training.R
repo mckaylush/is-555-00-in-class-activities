@@ -35,8 +35,8 @@ loan_data %>%
 apply_rules <- function(data) {
   rules_applied <- data %>%
     mutate(predicted_loan_approval = case_when(
-      stable_job == 1 ~ 'approve',  # First rule: approve if they have a stable job
-      .default = 'deny'          # the .default parameter is the "else" in a case_when()
+      stable_job == 1 & outstanding_debt == 0 ~ 'approve',  # Approve if job is stable & no debt
+      .default = 'deny'  # Deny otherwise
     ))
   return(rules_applied)
 }

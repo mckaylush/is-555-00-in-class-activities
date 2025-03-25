@@ -8,7 +8,7 @@ df4 <- read_csv('https://www.dropbox.com/s/js8tehtsk7btpeq/df_4.csv?dl=1')
 # A few sample calculations:
 df1 %>% summarize(across(everything(), list(mean = ~mean(.x), 
                                             sd = ~sd(.x))))
-
+df_binded <- bind_rows(df1,df2,df3,df4)
 # correlation matrix:
 df1 %>% cor()
 
@@ -18,3 +18,4 @@ df1 %>% cor()
 # y ~ x --> uses R's formula expression syntax to say "y regressed on x"
 # %>% coefficients() --> this just extracts the coefficients from the resulting model
 lm(y ~ x, data = df1) %>% coefficients()
+
